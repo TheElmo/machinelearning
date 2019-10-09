@@ -22,10 +22,9 @@ def drawGraph(data):
     #YOUR CODE HERE
     high_x_bound = 0
     for point in data:
-        print(point)
         if point[0] > high_x_bound:
             high_x_bound = point[0]
-        plt.scatter(point[0],point[1])
+        plt.scatter(point[0],point[1], c="blue")
     plt.show()
 
 
@@ -48,11 +47,11 @@ def computeCost(X, y, theta):
     #    3. bereken het verschil tussen deze voorspelling en de werkelijke waarde
     #    4. kwadrateer dit verschil
     #    5. tal al deze kwadraten bij elkaar op en deel dit door twee keer het aantal datapunten
-
-    J = 0
-
-    # YOUR CODE HERE
-
+    m = X.shape[0]
+    predictions = np.dot(X,theta)
+    error = (predictions - y) ** 2
+    total = error.sum()
+    J = total / (2*m)
     return J
 
 
@@ -74,11 +73,14 @@ def gradientDescent(X, y, theta, alpha, num_iters):
     #   3. vermenigvuldig dit verschil met de i-de waarde van X
     #   4. update de i-de parameter van theta, namelijk door deze te verminderen met
     #      alpha keer het gemiddelde van de som van de vermenigvuldiging uit 3
-
-    m,n = X.shape
-
-    # YOUR CODE HERE
-
+    theta = theta.T
+    for i in range(num_iters):
+        m,n = X.shape
+        predictions = np.dot(X,theta)
+        error = (predictions - y)
+        gradient = np.dot(X.T,error) / m
+        # YOUR CODE HERE
+        theta = theta - (alpha * gradient)
     # aan het eind van deze loop retourneren we de nieuwe waarde van theta
     # (wat is de dimensionaliteit van theta op dit moment?).
 
@@ -101,11 +103,15 @@ def contourPlot(X, y):
     t1 = np.linspace(-10, 10, 100)
     t2 = np.linspace(-1, 4, 100)
     T1, T2 = np.meshgrid(t1, t2)
-
     J_vals = np.zeros( (len(t2), len(t2)) )
-
-    #YOUR CODE HERE 
-
+    #YOUR CODE HERE
+    for index1 in range(len(t1)):
+        for index2 in range(len(t2)):
+            val1 = t1[index1]
+            val2 = t2[index2]
+            theta = np.array([val1,val2])
+            J_vals[index1][index2] = computeCost(X,y,theta)
+    
     surf = ax.plot_surface(T1, T2, J_vals, rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
 
     xLabel = ax.set_xlabel(r'$\theta_0$', linespacing=3.2)
