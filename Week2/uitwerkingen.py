@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 import matplotlib.pyplot as plt
 import matplotlib
 from scipy.sparse import csr_matrix
@@ -34,8 +35,14 @@ def get_y_matrix(y, m):
     # y_i=10, dan is regel i in de matrix [0,0,...1] (in dit geval is de breedte
     # van de matrix 10 (0-9), maar de methode moet werken voor elke waarde van 
     # y en m
-
-    pass 
+    np.set_printoptions(threshold=sys.maxsize)
+    cols = y.T[0] #Get the data
+    cols = cols-1 #Remove 1 from all values (because 1 has to go on index 0, 2 on 1 etc...)
+    rows = [i for i in range(len(cols))] #Get the all the values
+    data = [1 for _ in range(len(cols))] #Get a similair matrix filled with 1's
+    w = max(cols)+1 # arrays zijn zero-based
+    y_vec = csr_matrix((data, (rows, cols)), shape=(len(rows), w)).toarray()
+    return y_vec
 
 
 # ==== OPGAVE 2c ==== 
