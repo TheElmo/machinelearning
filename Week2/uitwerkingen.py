@@ -70,6 +70,9 @@ def predictNumber(Theta1, Theta2, X):
     # Voeg enen toe aan het begin van elke stap en reshape de uiteindelijke
     # vector zodat deze dezelfde dimensionaliteit heeft als y in de exercise.
 
+    #1.
+    X = np.c_[np.ones(len(X)), X[:, [0]]]
+    
     pass
 
 
