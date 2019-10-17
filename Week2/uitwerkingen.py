@@ -35,13 +35,10 @@ def get_y_matrix(y, m):
     # y_i=10, dan is regel i in de matrix [0,0,...1] (in dit geval is de breedte
     # van de matrix 10 (0-9), maar de methode moet werken voor elke waarde van 
     # y en m
-    np.set_printoptions(threshold=sys.maxsize)
-    cols = y.T[0] #Get the data
-    cols = cols-1 #Remove 1 from all values (because 1 has to go on index 0, 2 on 1 etc...)
-    rows = [i for i in range(len(cols))] #Get the all the values
-    data = [1 for _ in range(len(cols))] #Get a similair matrix filled with 1's
-    w = max(cols)+1 # arrays zijn zero-based
-    y_vec = csr_matrix((data, (rows, cols)), shape=(len(rows), w)).toarray()
+    rows = [i for i in range(m)] #Get the all the values
+    data = [1 for _ in range(m)] #Get a similair matrix filled with 1's
+    w = max(y.T[0]) # arrays zijn zero-based
+    y_vec = csr_matrix((data, (rows, y.T[0]-1)), shape=(m, w)).toarray()
     return y_vec
 
 
@@ -71,11 +68,18 @@ def predictNumber(Theta1, Theta2, X):
     # vector zodat deze dezelfde dimensionaliteit heeft als y in de exercise.
 
     #1.
-    X = np.c_[np.ones(len(X)), X[:, [0]]]
-    
-    pass
+    ones = np.ones((len(X),1))
+    X = np.c_[ones,X]
 
+    #2.
+    a2 = sigmoid(np.dot(X,Theta1.T))
 
+    #3.
+    a2 = np.c_[ones,a2]
+
+    #4.
+    out = sigmoid(np.dot(a2,Theta2.T))
+    return out
 
 # ===== deel 2: =====
 def computeCost(Theta1, Theta2, X, y):
@@ -87,10 +91,12 @@ def computeCost(Theta1, Theta2, X, y):
     # Let op: de y die hier binnenkomt is de m×1-vector met waarden van 1...10. 
     # Maak gebruik van de methode get_y_matrix() die je in opgave 2a hebt gemaakt
     # om deze om te zetten naar een matrix. 
-
-    pass
-
-
+    y = get_y_matrix(y,len(y))
+    predictions = predictNumber(Theta1, Theta2,X)
+    total = np.dot(y,np.log(predictions).T) + np.dot(1-y,np.log(1-predictions).T)
+    total_sum = total.sum(axis=0) / len(y)
+    cost = (-1 * total_sum.sum() / len(y))
+    return cost
 
 # ==== OPGAVE 3a ====
 def sigmoidGradient(z): 
