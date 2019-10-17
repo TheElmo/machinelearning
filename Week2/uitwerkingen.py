@@ -103,8 +103,7 @@ def sigmoidGradient(z):
     # Retourneer hier de waarde van de afgeleide van de sigmoïdefunctie.
     # Zie de opgave voor de exacte formule. Zorg ervoor dat deze werkt met
     # scalaire waarden en met vectoren.
-
-    pass
+    return (sigmoid(z) * (1-sigmoid(z)))
 
 # ==== OPGAVE 3b ====
 def nnCheckGradients(Theta1, Theta2, X, y): 
@@ -113,10 +112,12 @@ def nnCheckGradients(Theta1, Theta2, X, y):
 
     Delta2 = np.zeros(Theta1.shape)
     Delta3 = np.zeros(Theta2.shape)
-    m = 1 #voorbeeldwaarde; dit moet je natuurlijk aanpassen naar de echte waarde van m
+    m = 10 #voorbeeldwaarde; dit moet je natuurlijk aanpassen naar de echte waarde van m
 
-    for i in range(m): 
-        #YOUR CODE HERE
+    prediction = predictNumber(Theta1,Theta2,X)
+    delta3 = prediction - get_y_matrix(y,m)
+    delta2 = np.dot(Theta2[m].T,delta3) * sigmoidGradient(np.dot(Theta1,X))
+    for i in range(m):
         pass
 
     Delta2_grad = Delta2 / m
