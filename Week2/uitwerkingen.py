@@ -20,10 +20,7 @@ def sigmoid(z):
     # voor dat de code zowel werkt wanneer z een getal is als wanneer z een
     # vector is.
     # Maak gebruik van de methode exp() in NumPy.
-    try:
-        return 1/(1+np.exp(-1*range(z)))
-    except:
-        return 1/(1+np.exp(-1*z))
+    return 1/(1+np.exp(-z))
 
 
 # ==== OPGAVE 2b ====
@@ -81,6 +78,19 @@ def predictNumber(Theta1, Theta2, X):
     out = sigmoid(np.dot(a2,Theta2.T))
     return out
 
+def predictNumForward(Theta1, Theta2, X):
+    ones = np.ones((len(X),1))
+    X = np.c_[ones,X]
+    a1 = X
+    z2 = np.dot(a1,Theta1.T)
+
+    a2 = sigmoid(z2)
+    a2 = np.c_[ones,a2]
+
+    z3 =np.dot(a2,Theta2.T)
+    a3 = sigmoid(z3)
+    return a1,a2,a3
+
 # ===== deel 2: =====
 def computeCost(Theta1, Theta2, X, y):
     # Deze methode maakt gebruik van de methode predictNumber() die je hierboven hebt
@@ -98,6 +108,12 @@ def computeCost(Theta1, Theta2, X, y):
     cost = (-1 * total_sum.sum() / len(y))
     return cost
 
+    # m=len(y)
+    # error = (-y * np.log(predictions)) - ((1-y)*np.log(1-predictions))
+    # cost = 1/m * sum(error)
+    # print(cost.sum())
+    
+
 # ==== OPGAVE 3a ====
 def sigmoidGradient(z): 
     # Retourneer hier de waarde van de afgeleide van de sigmoïdefunctie.
@@ -110,17 +126,20 @@ def nnCheckGradients(Theta1, Theta2, X, y):
     # Retourneer de gradiënten van Theta1 en Theta2, gegeven de waarden van X en van y
     # Zie het stappenplan in de opgaven voor een mogelijke uitwerking.
 
-    Delta2 = np.zeros(Theta1.shape)
-    Delta3 = np.zeros(Theta2.shape)
-    m = 10 #voorbeeldwaarde; dit moet je natuurlijk aanpassen naar de echte waarde van m
+    Delta1 = np.zeros(Theta1.shape)
+    Delta2 = np.zeros(Theta2.shape)
+    m = X.shape[0] #voorbeeldwaarde; dit moet je natuurlijk aanpassen naar de echte waarde van m
 
-    prediction = predictNumber(Theta1,Theta2,X)
-    delta3 = prediction - get_y_matrix(y,m)
-    delta2 = np.dot(Theta2[m].T,delta3) * sigmoidGradient(np.dot(Theta1,X))
+    a1,a2,a3 = predictNumForward(Theta1,Theta2,X)
+    Y = get_y_matrix(y,m)
     for i in range(m):
-        pass
+        delta3 = a3[i] - Y[i]
+        delta2 = np.dot(Theta2.T, delta3) * sigmoidGradient(a2[i])
 
-    Delta2_grad = Delta2 / m
-    Delta3_grad = Delta3 / m
+        Delta1 += np.dot(delta2.reshape(-1,1), a1[i].reshape(1,-1))[1:, :]
+        Delta2 += np.dot(delta3.reshape(-1,1), a2[i].reshape(1,-1))
+
+    Delta2_grad = Delta1 / m
+    Delta3_grad = Delta2 / m
     
     return Delta2_grad, Delta3_grad
