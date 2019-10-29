@@ -80,10 +80,9 @@ def predictNumber(Theta1, Theta2, X):
 
 def predictNumForward(Theta1, Theta2, X):
     ones = np.ones((len(X),1))
-    X = np.c_[ones,X]
-    a1 = X
-    z2 = np.dot(a1,Theta1.T)
+    a1 = np.c_[ones,X]
 
+    z2 = np.dot(a1,Theta1.T)
     a2 = sigmoid(z2)
     a2 = np.c_[ones,a2]
 
@@ -101,17 +100,14 @@ def computeCost(Theta1, Theta2, X, y):
     # Let op: de y die hier binnenkomt is de m×1-vector met waarden van 1...10. 
     # Maak gebruik van de methode get_y_matrix() die je in opgave 2a hebt gemaakt
     # om deze om te zetten naar een matrix. 
-    y = get_y_matrix(y,len(y))
-    predictions = predictNumber(Theta1, Theta2,X)
-    total = np.dot(y,np.log(predictions).T) + np.dot(1-y,np.log(1-predictions).T)
-    total_sum = total.sum(axis=0) / len(y)
-    cost = (-1 * total_sum.sum() / len(y))
-    return cost
+    m = len(y)
+    y = get_y_matrix(y, m)
 
-    # m=len(y)
-    # error = (-y * np.log(predictions)) - ((1-y)*np.log(1-predictions))
-    # cost = 1/m * sum(error)
-    # print(cost.sum())
+    predictions = predictNumber(Theta1, Theta2, X)
+    part1 = np.multiply(y, np.log(predictions))
+    part2 = np.multiply((1-y), np.log(1-predictions))
+    cost = part1 + part2
+    return -1 * (np.sum(cost))/m
     
 
 # ==== OPGAVE 3a ====
@@ -126,8 +122,8 @@ def nnCheckGradients(Theta1, Theta2, X, y):
     # Retourneer de gradiënten van Theta1 en Theta2, gegeven de waarden van X en van y
     # Zie het stappenplan in de opgaven voor een mogelijke uitwerking.
 
-    Delta1 = np.zeros(Theta1.shape)
-    Delta2 = np.zeros(Theta2.shape)
+    Delta2 = np.zeros(Theta1.shape)
+    Delta3 = np.zeros(Theta2.shape)
     m = X.shape[0] #voorbeeldwaarde; dit moet je natuurlijk aanpassen naar de echte waarde van m
 
     a1,a2,a3 = predictNumForward(Theta1,Theta2,X)
@@ -136,10 +132,10 @@ def nnCheckGradients(Theta1, Theta2, X, y):
         delta3 = a3[i] - Y[i]
         delta2 = np.dot(Theta2.T, delta3) * sigmoidGradient(a2[i])
 
-        Delta1 += np.dot(delta2.reshape(-1,1), a1[i].reshape(1,-1))[1:, :]
-        Delta2 += np.dot(delta3.reshape(-1,1), a2[i].reshape(1,-1))
+        Delta2 += np.dot(delta2.reshape(-1,1), a1[i].reshape(1,-1))[1:, :]
+        Delta3 += np.dot(delta3.reshape(-1,1), a2[i].reshape(1,-1))
 
-    Delta2_grad = Delta1 / m
-    Delta3_grad = Delta2 / m
+    Delta2_grad = Delta2 / m
+    Delta3_grad = Delta3 / m
     
     return Delta2_grad, Delta3_grad
